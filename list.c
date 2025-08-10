@@ -19,21 +19,11 @@ node *delete_first_match(node *head_node, int search_value, int *delete_status);
 node *delete_all_match(node *head_node, int search_value, int *delete_status);
 node *ll_append(node *ll1, node *ll2);
 node *ll_reverse(node *head_node);
+void ll_sort(node *head_node);
+node *ll_clear(node *head_node);
 
 int main() {
 
-    node *head_node = NULL;
-    head_node = insert_at_tail(head_node, 1);
-    head_node = insert_at_tail(head_node, 2);
-    head_node = insert_at_tail(head_node, 3);
-    head_node = insert_at_tail(head_node, 4);
-    head_node = insert_at_tail(head_node, 5);
-    head_node = insert_at_tail(head_node, 6);
-    head_node = insert_at_tail(head_node, 7);
-    head_node = insert_at_tail(head_node, 8);    
-    ll_display(head_node);
-   	head_node = ll_reverse(head_node);
-	ll_display(head_node);
     return 0;
 }
 
@@ -245,3 +235,29 @@ node *ll_reverse(node *head_node) {
 	return head_node;
 }
 
+void ll_sort(node *head_node) {
+	if(head_node == NULL || head_node->nextnode == NULL) return;
+
+	node *step_node = head_node->nextnode;
+	int temp;
+	while(head_node != NULL) {
+		step_node = head_node->nextnode;
+		while(step_node != NULL) {
+			if(head_node->value > step_node->value) {
+				temp = head_node->value;
+				head_node->value = step_node->value;
+				step_node->value = temp;
+			}
+			step_node = step_node->nextnode;
+		}
+		head_node = head_node->nextnode;
+	}	
+}
+
+node *ll_clear(node *head_node) {
+	if(head_node != NULL) {
+		ll_clear(head_node->nextnode);
+		free(head_node);
+	}
+	return NULL;	
+}
