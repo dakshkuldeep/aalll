@@ -52,7 +52,7 @@ node *delete_at_head(node *head_node) {
     }
 }
 
-node *delete_at_end(node *head_node) {
+node *delete_at_tail(node *head_node) {
     if(head_node == NULL)
         return NULL;
     else if(head_node->nextnode == NULL) {
@@ -235,4 +235,75 @@ node *ll_clear(node *head_node) {
 		free(head_node);
 	}
 	return NULL;	
+}
+
+node *ll_tail(node *head_node) {
+	while(head_node->nextnode != NULL)
+		head_node = head_node->nextnode;
+	return head_node;
+}
+
+node *quicksort_par(node *head_node, node *tail_node, node **new_head, node **new_tail) {
+	node *pivot = tail_node;
+	node *prev = NULL, *current = head_node, *tail = pivot;
+
+	while(current != pivot) {
+		if(current->value <= pivot->value) {
+			if(*new_head == NULL) {
+				*new_head = current;
+			}
+			prev = current;
+			current = current->nextnode;
+		} else {
+			if(prev) {
+				prev->nextnode = current->nextnode;
+			}
+			node *temp = current->nextnode;
+			current->nextnode = NULL;
+			tail->nextnode = current;
+			tail = current;
+			current = temp;
+		}
+	}
+
+	// if pivot = smallest element it becomes the new head
+	if(*new_head == NULL) {
+		*new_head = pivot;
+	}
+	*new_tail = tail;
+	return pivot;
+}
+
+node *quicksort_rec(node *head_node, node *tail_node) {
+	if(!head_node || head_node == tail_node) {
+		return head_node;
+	}
+
+	node *new_head = NULL, *new_tail = NULL;
+	node *pivot = quicksort_par(head_node, tail_node, &new_head, &new_tail);
+	// no need to recurse on the left side if pivot is first element
+	if(new_head != pivot) {
+		node *temp = new_head;
+		// find node before pivot
+		while(temp->nextnode != pivot) {
+			temp = temp->nextnode;
+		}
+
+		//disconnect left part and recurse
+		temp->nextnode = NULL;
+		new_head = quicksort_rec(new_head, temp);
+		//reconnect left part to pivot
+		temp = ll_tail(new_head);
+		temp->nextnode = pivot;
+	}
+
+	// recurse on the right part
+	pivot->nextnode = quicksort_rec(pivot->nextnode, new_tail);
+
+	return new_head;
+}
+
+node *ll_quicksort(node *head_node) {
+	node *tail_node = ll_tail(head_node);
+	return quicksort_rec(head_node, tail_node);
 }
